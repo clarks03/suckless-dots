@@ -12,4 +12,10 @@ wal -i /home/stephen/Wallpapers/wallhaven-7p75yy.png
 # Resetting wallpaper
 /home/stephen/.fehbg &
 
+# Starting up dwmblocks
+dwmblocks &  # not sure if setsid is necessary here or not
+
+# Setting up notifs with dunst
+dunst &  # only keeping this here for now just so i can test if the dwmblocks scripts are working
+
 exec dwm

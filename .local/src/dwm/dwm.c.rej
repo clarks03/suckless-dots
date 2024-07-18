@@ -1,14 +1,10 @@
 --- dwm.c
 +++ dwm.c
-@@ -1919,7 +1941,10 @@ updategeom(void)
- 					m->clients = c->next;
- 					detachstack(c);
- 					c->mon = mons;
--					attach(c);
-+					if( attachbelow )
-+						attachBelow(c);
-+					else
-+						attach(c);
- 					attachstack(c);
- 				}
- 				if (m == selmon)
+@@ -207,6 +208,7 @@ static void setup(void);
+ static void seturgent(Client *c, int urg);
+ static void showhide(Client *c);
+ static void sigchld(int unused);
++static void sigstatusbar(const Arg *arg);
+ static void spawn(const Arg *arg);
+ static void tag(const Arg *arg);
+ static void tagmon(const Arg *arg);
