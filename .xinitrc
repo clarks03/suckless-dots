@@ -7,7 +7,10 @@ xset r rate 200 40
 /home/stephen/.screenlayout/layout.sh
 
 # Setting colourscheme before wallpaper (cuz pywal sets wallpaper too)
-wal -i /home/stephen/Wallpapers/wallhaven-7p75yy.png
+# wal -i /home/stephen/Wallpapers/wallhaven-7p75yy.png
+
+# Or, choose a manual colourscheme from here:
+xrdb /home/stephen/.config/Xresources
 
 # Resetting wallpaper
 /home/stephen/.fehbg &

@@ -3,19 +3,19 @@
 clock=$(date '+%I')
 
 case "$clock" in
-	"00") icon="🕛" ;;
-	"01") icon="🕐" ;;
-	"02") icon="🕑" ;;
-	"03") icon="🕒" ;;
-	"04") icon="🕓" ;;
-	"05") icon="🕔" ;;
-	"06") icon="🕕" ;;
-	"07") icon="🕖" ;;
-	"08") icon="🕗" ;;
-	"09") icon="🕘" ;;
-	"10") icon="🕙" ;;
-	"11") icon="🕚" ;;
-	"12") icon="🕛" ;;
+	"00") icon="󱑊" ;;
+	"01") icon="󱐿" ;;
+	"02") icon="󱑀" ;;
+	"03") icon="󱑁" ;;
+	"04") icon="󱑂" ;;
+	"05") icon="󱑃" ;;
+	"06") icon="󱑄" ;;
+	"07") icon="󱑅" ;;
+	"08") icon="󱑆" ;;
+	"09") icon="󱑇" ;;
+	"10") icon="󱑈" ;;
+	"11") icon="󱑉" ;;
+	"12") icon="󱑊" ;;
 esac
 
 case $BLOCK_BUTTON in
@@ -26,4 +26,6 @@ case $BLOCK_BUTTON in
 	6) setsid -f "$TERMINAL" -e "$EDITOR" "$0" ;;
 esac
 
-date "+%Y %b %d (%a) $icon%I:%M%p"
+# Time = %Y %b %d (%a) 
+
+date "+^b#83a598^  $icon  ^b#ebdbb2^  %I:%M%p  "

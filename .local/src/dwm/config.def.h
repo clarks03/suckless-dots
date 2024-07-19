@@ -4,14 +4,19 @@
 /* appearance */
 static const unsigned int borderpx  = 2;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
-static const unsigned int gappih    = 5;       /* horiz inner gap between windows */
-static const unsigned int gappiv    = 5;       /* vert inner gap between windows */
-static const unsigned int gappoh    = 5;       /* horiz outer gap between windows and screen edge */
-static const unsigned int gappov    = 5;       /* vert outer gap between windows and screen edge */
+static const unsigned int systraypinning = 0;   /* 0: sloppy systray follows selected monitor, >0: pin systray to monitor X*/
+static const unsigned int systrayonleft = 0;   /* 0: systray in the right corner, >0: systray on left of status text */
+static const unsigned int systrayspacing = 2;   /* systray spacing */
+static const unsigned int systraypinningfailfirst = 1;   /* 1: If pinning fails, display systray on the first monitor. False: display systray on the last monitor */
+static const unsigned int showsystray = 1;   /* 0 means no systray: */
+static const unsigned int gappih    = 5;        /* horiz inner gap between windows */
+static const unsigned int gappiv    = 5;        /* vert inner gap between windows */
+static const unsigned int gappoh    = 0;        /* horiz outer gap between windows and screen edge */
+static const unsigned int gappov    = 0;        /* vert outer gap between windows and screen edge */
 static       int smartgaps          = 0;        /* 1 means no outer gap when there is only one window */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
-static const char *fonts[]          = { "JetBrainsMono Nerd Font:size=10" };
+static const char *fonts[]          = { "JetBrainsMono Nerd Font:size=10", "Noto Fonts Emoji:size=10" };
 static const char dmenufont[]       = "JetBrainsMono Nerd Font:size=10";
 static char normbgcolor[]           = "#222222";
 static char normbordercolor[]       = "#444444";
@@ -19,10 +24,25 @@ static char normfgcolor[]           = "#bbbbbb";
 static char selfgcolor[]            = "#eeeeee";
 static char selbordercolor[]        = "#005577";
 static char selbgcolor[]            = "#005577";
-static char *colors[][3]      = {
+static char statusbgcolor[]         = "#222222";
+static char statusfgcolor[]         = "#444444";
+static char normtagsbgcolor[]       = "#222222";
+static char normtagsfgcolor[]       = "#bbbbbb";
+static char seltagsbgcolor[]        = "#005577";
+static char seltagsfgcolor[]        = "#eeeeee";
+static char norminfobgcolor[]       = "#222222";
+static char norminfofgcolor[]       = "#444444";
+static char selinfobgcolor[]        = "#222222";
+static char selinfofgcolor[]        = "#444444";
+static char *colors[][3]            = {
 	/*               fg           bg           border   */
 	[SchemeNorm] = { normfgcolor, normbgcolor, normbordercolor },
 	[SchemeSel]  = { selfgcolor,  selbgcolor,  selbordercolor  },
+    [SchemeStatus] = { statusfgcolor, statusbgcolor, "#000000" },
+    [SchemeTagsNorm] = { normtagsfgcolor, normtagsbgcolor, "#000000" },
+    [SchemeTagsSel] = { seltagsfgcolor, seltagsbgcolor, "#000000" },
+    [SchemeInfoNorm] = { norminfofgcolor, norminfobgcolor, "#000000" },
+    [SchemeInfoSel] = { selinfofgcolor, selinfobgcolor, "#000000" },
 };
 
 /* tagging */
@@ -42,7 +62,6 @@ static const Rule rules[] = {
 static const float mfact     = 0.50; /* factor of master area size [0.05..0.95] */
 static const int nmaster     = 1;    /* number of clients in master area */
 static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
-static const int attachbelow = 1;    /* 1 means attach after the currently active window */
 static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen window */
 
 #define FORCE_VSPLIT 1  /* nrowgrid layout: force two clients to always split vertically */
@@ -88,7 +107,7 @@ static const char *termcmd[]  = { "st", NULL };
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_space,  spawn,          {.v = dmenucmd } },
-	{ MODKEY,             		XK_Return, spawn,          {.v = termcmd } },
+	{ MODKEY,                       XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_g,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
@@ -96,30 +115,30 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },
 	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },
 	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },
-	{ MODKEY|ShiftMask,             XK_h,      setcfact,       {.f = +0.25} },
-	{ MODKEY|ShiftMask,             XK_l,      setcfact,       {.f = -0.25} },
-	{ MODKEY|ShiftMask,             XK_o,      setcfact,       {.f = 0.00} },
-	{ MODKEY|ShiftMask,             XK_j,      movestack,      {.i = +1 } },
-	{ MODKEY|ShiftMask,             XK_k,      movestack,      {.i = -1 } },
+    { MODKEY|ShiftMask,             XK_j,      setcfact,       {.f = -0.25} },
+    { MODKEY|ShiftMask,             XK_k,      setcfact,       {.f = +0.25} },
+    { MODKEY|ShiftMask,             XK_o,      setcfact,       {.f =  0.00} },
+	{ MODKEY|ControlMask,           XK_j,      movestack,      {.i = +1 } },
+	{ MODKEY|ControlMask,           XK_k,      movestack,      {.i = -1 } },
 	{ MODKEY,                       XK_f,      zoom,           {0} },
-	{ MODKEY|Mod4Mask,              XK_u,      incrgaps,      {.i = +1 } },
-	{ MODKEY|Mod4Mask|ShiftMask,    XK_u,      incrgaps,      {.i = -1 } },
-	{ MODKEY|Mod4Mask,              XK_i,      incrigaps,     {.i = +1 } },
-	{ MODKEY|Mod4Mask|ShiftMask,    XK_i,      incrigaps,     {.i = -1 } },
-	{ MODKEY|Mod4Mask,              XK_o,      incrogaps,     {.i = +1 } },
-	{ MODKEY|Mod4Mask|ShiftMask,    XK_o,      incrogaps,     {.i = -1 } },
-	{ MODKEY|Mod4Mask,              XK_6,      incrihgaps,    {.i = +1 } },
-	{ MODKEY|Mod4Mask|ShiftMask,    XK_6,      incrihgaps,    {.i = -1 } },
-	{ MODKEY|Mod4Mask,              XK_7,      incrivgaps,    {.i = +1 } },
-	{ MODKEY|Mod4Mask|ShiftMask,    XK_7,      incrivgaps,    {.i = -1 } },
-	{ MODKEY|Mod4Mask,              XK_8,      incrohgaps,    {.i = +1 } },
-	{ MODKEY|Mod4Mask|ShiftMask,    XK_8,      incrohgaps,    {.i = -1 } },
-	{ MODKEY|Mod4Mask,              XK_9,      incrovgaps,    {.i = +1 } },
-	{ MODKEY|Mod4Mask|ShiftMask,    XK_9,      incrovgaps,    {.i = -1 } },
-	{ MODKEY|Mod4Mask,              XK_0,      togglegaps,    {0} },
-	{ MODKEY|Mod4Mask|ShiftMask,    XK_0,      defaultgaps,   {0} },
+    { MODKEY|ControlMask,           XK_u,      incrgaps,       {.i = +1 } },
+    { MODKEY|ControlMask|ShiftMask, XK_u,      incrgaps,       {.i = -1 } },
+    { MODKEY|ControlMask,           XK_i,      incrigaps,      {.i = +1 } },
+    { MODKEY|ControlMask|ShiftMask, XK_i,      incrigaps,      {.i = -1 } },
+    { MODKEY|ControlMask,           XK_o,      incrogaps,      {.i = +1 } },
+    { MODKEY|ControlMask|ShiftMask, XK_o,      incrogaps,      {.i = -1 } },
+    { MODKEY|ControlMask,           XK_6,      incrihgaps,     {.i = +1 } },
+    { MODKEY|ControlMask|ShiftMask, XK_6,      incrihgaps,     {.i = -1 } },
+    { MODKEY|ControlMask,           XK_7,      incrivgaps,     {.i = +1 } },
+    { MODKEY|ControlMask|ShiftMask, XK_7,      incrivgaps,     {.i = -1 } },
+    { MODKEY|ControlMask,           XK_8,      incrohgaps,     {.i = +1 } },
+    { MODKEY|ControlMask|ShiftMask, XK_8,      incrohgaps,     {.i = -1 } },
+    { MODKEY|ControlMask,           XK_9,      incrovgaps,     {.i = +1 } },
+    { MODKEY|ControlMask|ShiftMask, XK_9,      incrovgaps,     {.i = -1 } },
+    { MODKEY|ControlMask,           XK_0,      togglegaps,     {0} },
+    { MODKEY|ControlMask|ShiftMask, XK_0,      defaultgaps,    {0} },
 	{ MODKEY,                       XK_Tab,    view,           {0} },
-	{ MODKEY,             		XK_q,      killclient,     {0} },
+	{ MODKEY,                       XK_q,      killclient,     {0} },
 	{ MODKEY,                       XK_w,      setlayout,      {.v = &layouts[0]} },
 	{ MODKEY,                       XK_e,      setlayout,      {.v = &layouts[1]} },
 	{ MODKEY,                       XK_r,      setlayout,      {.v = &layouts[2]} },
@@ -154,6 +173,8 @@ static const Button buttons[] = {
 	{ ClkStatusText,        0,              Button1,        sigstatusbar,   {.i = 1} },
 	{ ClkStatusText,        0,              Button2,        sigstatusbar,   {.i = 2} },
 	{ ClkStatusText,        0,              Button3,        sigstatusbar,   {.i = 3} },
+	{ ClkStatusText,        0,              Button4,        sigstatusbar,   {.i = 4} },
+	{ ClkStatusText,        0,              Button5,        sigstatusbar,   {.i = 5} },
 	{ ClkClientWin,         MODKEY,         Button1,        movemouse,      {0} },
 	{ ClkClientWin,         MODKEY,         Button2,        togglefloating, {0} },
 	{ ClkClientWin,         MODKEY,         Button3,        resizemouse,    {0} },
@@ -162,4 +183,3 @@ static const Button buttons[] = {
 	{ ClkTagBar,            MODKEY,         Button1,        tag,            {0} },
 	{ ClkTagBar,            MODKEY,         Button3,        toggletag,      {0} },
 };
-
