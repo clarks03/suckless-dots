@@ -59,8 +59,6 @@ static void zoom(const Arg *);
 static void zoomabs(const Arg *);
 static void zoomreset(const Arg *);
 static void ttysend(const Arg *);
-void kscrollup(const Arg *);
-void kscrolldown(const Arg *);
 
 /* config.h for applying patches and the configuration. */
 #include "config.h"
@@ -1477,19 +1475,19 @@ xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, i
 		fg = bg;
 
     if (dmode & DRAW_BG) {
-        /* Intelligent cleaning up of the borders. */
+        /* Intelligent cleaning up of the borders */
         if (x == 0) {
-            xclear(0, (y == 0)? 0 : winy, win.hborderpx,
+            xclear(0, (y == 0) ? 0 : winy, borderpx,
                    winy + win.ch +
-                   ((winy + win.ch >= win.vborderpx + win.th)? win.h : 0));
+                   ((winy + win.ch >= borderpx + win.th) ? win.h : 0));
         }
-        if (winx + width >= win.hborderpx + win.tw) {
-            xclear(winx + width, (y == 0)? 0 : winy, win.w,
-                   ((winy + win.ch >= win.vborderpx + win.th)? win.h : (winy + win.ch)));
+        if (winx + width >= borderpx + win.tw) {
+            xclear(winx + width, (y == 0) ? 0 : winy, win.w,
+                   ((winy + win.ch >= borderpx + win.th) ? win.h : (winy + win.ch)));
         }
         if (y == 0)
-            xclear(winx, 0, winx + width, win.vborderpx);
-        if (winy + win.ch >= win.vborderpx + win.th)
+            xclear(winx, 0, winx + width, borderpx);
+        if (winy + win.ch >= borderpx + win.th)
             xclear(winx, winy + win.ch, winx + width, win.h);
         /* Fill the background */
         XftDrawRect(xw.draw, bg, winx, winy, width, win.ch);
@@ -1502,18 +1500,19 @@ xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, i
             /* Render the glyphs. */
             XftDrawGlyphFontSpec(xw.draw, fg, specs, len);
         }
-
         /* Render underline and strikethrough. */
         if (base.mode & ATTR_UNDERLINE) {
             XftDrawRect(xw.draw, fg, winx, winy + dc.font.ascent + 1,
-                        width, 1);
+                    width, 1);
         }
 
         if (base.mode & ATTR_STRUCK) {
             XftDrawRect(xw.draw, fg, winx, winy + 2 * dc.font.ascent / 3,
-                        width, 1);
+                    width, 1);
         }
     }
+	/* /* Reset clip to none. */ 
+	/* XftDrawSetClip(xw.draw, 0); */
 }
 
 void
@@ -1527,17 +1526,14 @@ xdrawglyph(Glyph g, int x, int y)
 }
 
 void
-xdrawcursor(int cx, int cy, Glyph g, int ox, int oy, Glyph og, Line line, int len)
+xdrawcursor(int cx, int cy, Glyph g, int ox, int oy, Glyph og)
 {
 	Color drawcol;
 
 	/* remove the old cursor */
 	if (selected(ox, oy))
 		og.mode ^= ATTR_REVERSE;
-
-	/* Redraw the line where cursor was previously.
-	 * It will restore wide glyphs and ligatures broken by the cursor. */
-	xdrawline(line, 0, oy, len);
+	xdrawglyph(og, ox, oy);
 
 	if (IS_SET(MODE_HIDE))
 		return;

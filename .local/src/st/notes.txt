@@ -1,0 +1,8 @@
+Patches I would like to install:
+- ligatures
+    - boxdraw & scrollback (separate deps.)
+- scrollback
+    - no deps
+- font2
+    - no deps
+

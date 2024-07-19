@@ -1,34 +1,18 @@
-From 5770f2fc02afca341c275fc340bbc5003ecc3df8 Mon Sep 17 00:00:00 2001
-From: Iskustvo <iskustvo@yahoo.com>
-Date: Sat, 7 Jan 2023 01:23:37 +0100
-Subject: [PATCH] [PATCH] add glyph wide support patch
+From 9583955da47177c9557210f70baaaf9511ba106c Mon Sep 17 00:00:00 2001
+From: wael <40663@protonmail.com>
+Date: Mon, 11 Apr 2022 17:14:06 +0300
+Subject: [PATCH] boxdraw support for glyph wide support
 
 ---
- st.c  |   3 +-
- st.h  |   6 +++
- win.h |   2 +-
- x.c   | 141 ++++++++++++++++++++++++++++++----------------------------
- 4 files changed, 81 insertions(+), 71 deletions(-)
+ st.h |   6 +++
+ x.c  | 139 ++++++++++++++++++++++++++++++-----------------------------
+ 2 files changed, 76 insertions(+), 69 deletions(-)
 
-diff --git a/st.c b/st.c
-index 62def59..cc6c78e 100644
---- a/st.c
-+++ b/st.c
-@@ -2640,7 +2640,8 @@ draw(void)
- 
- 	drawregion(0, 0, term.col, term.row);
- 	xdrawcursor(cx, term.c.y, term.line[term.c.y][cx],
--			term.ocx, term.ocy, term.line[term.ocy][term.ocx]);
-+		term.ocx, term.ocy, term.line[term.ocy][term.ocx],
-+		term.line[term.ocy], term.col);
- 	term.ocx = cx;
- 	term.ocy = term.c.y;
- 	xfinishdraw();
 diff --git a/st.h b/st.h
-index fd3b0d8..0053050 100644
+index 07a7c66..3b8c97d 100644
 --- a/st.h
 +++ b/st.h
-@@ -36,6 +36,12 @@ enum glyph_attribute {
+@@ -37,6 +37,12 @@ enum glyph_attribute {
  	ATTR_BOLD_FAINT = ATTR_BOLD | ATTR_FAINT,
  };
  
@@ -41,21 +25,8 @@ index fd3b0d8..0053050 100644
  enum selection_mode {
  	SEL_IDLE = 0,
  	SEL_EMPTY = 1,
-diff --git a/win.h b/win.h
-index 6de960d..94679e4 100644
---- a/win.h
-+++ b/win.h
-@@ -25,7 +25,7 @@ enum win_mode {
- 
- void xbell(void);
- void xclipcopy(void);
--void xdrawcursor(int, int, Glyph, int, int, Glyph);
-+void xdrawcursor(int, int, Glyph, int, int, Glyph, Line, int);
- void xdrawline(Line, int, int, int);
- void xfinishdraw(void);
- void xloadcols(void);
 diff --git a/x.c b/x.c
-index aa09997..85deee6 100644
+index bf6bbf9..1311c0d 100644
 --- a/x.c
 +++ b/x.c
 @@ -142,7 +142,7 @@ typedef struct {
@@ -67,7 +38,7 @@ index aa09997..85deee6 100644
  static void xdrawglyph(Glyph, int, int);
  static void xclear(int, int, int, int);
  static int xgeommasktogravity(int);
-@@ -1372,7 +1372,7 @@ xmakeglyphfontspecs(XftGlyphFontSpec *specs, const Glyph *glyphs, int len, int x
+@@ -1379,7 +1379,7 @@ xmakeglyphfontspecs(XftGlyphFontSpec *specs, const Glyph *glyphs, int len, int x
  }
  
  void
@@ -76,7 +47,7 @@ index aa09997..85deee6 100644
  {
  	int charlen = len * ((base.mode & ATTR_WIDE) ? 2 : 1);
  	int winx = borderpx + x * win.cw, winy = borderpx + y * win.ch,
-@@ -1463,47 +1463,40 @@ xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, i
+@@ -1470,51 +1470,45 @@ xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, i
  	if (base.mode & ATTR_INVISIBLE)
  		fg = bg;
  
@@ -105,22 +76,12 @@ index aa09997..85deee6 100644
 -	r.width = width;
 -	XftDrawSetClipRectangles(xw.draw, winx, winy, &r, 1);
 -
--	/* Render the glyphs. */
--	XftDrawGlyphFontSpec(xw.draw, fg, specs, len);
--
--	/* Render underline and strikethrough. */
--	if (base.mode & ATTR_UNDERLINE) {
--		XftDrawRect(xw.draw, fg, winx, winy + dc.font.ascent * chscale + 1,
--				width, 1);
+-	if (base.mode & ATTR_BOXDRAW) {
+-		drawboxes(winx, winy, width / len, win.ch, fg, bg, specs, len);
+-	} else {
+-		/* Render the glyphs. */
+-		XftDrawGlyphFontSpec(xw.draw, fg, specs, len);
 -	}
--
--	if (base.mode & ATTR_STRUCK) {
--		XftDrawRect(xw.draw, fg, winx, winy + 2 * dc.font.ascent * chscale / 3,
--				width, 1);
--	}
--
--	/* Reset clip to none. */
--	XftDrawSetClip(xw.draw, 0);
 +    if (dmode & DRAW_BG) {
 +        /* Intelligent cleaning up of the borders. */
 +        if (x == 0) {
@@ -140,16 +101,33 @@ index aa09997..85deee6 100644
 +        XftDrawRect(xw.draw, bg, winx, winy, width, win.ch);
 +    }
 +
-+    if (dmode & DRAW_FG) {
-+        /* Render the glyphs. */
-+        XftDrawGlyphFontSpec(xw.draw, fg, specs, len);
 +
++    if (dmode & DRAW_FG) {
++		if (base.mode & ATTR_BOXDRAW) {
++			drawboxes(winx, winy, width / len, win.ch, fg, bg, specs, len);
++		} else {
++			/* Render the glyphs. */
++			XftDrawGlyphFontSpec(xw.draw, fg, specs, len);
++		}
+ 
+-	/* Render underline and strikethrough. */
+-	if (base.mode & ATTR_UNDERLINE) {
+-		XftDrawRect(xw.draw, fg, winx, winy + dc.font.ascent * chscale + 1,
+-				width, 1);
+-	}
 +        /* Render underline and strikethrough. */
 +        if (base.mode & ATTR_UNDERLINE) {
 +            XftDrawRect(xw.draw, fg, winx, winy + dc.font.ascent + 1,
 +                        width, 1);
 +        }
-+
+ 
+-	if (base.mode & ATTR_STRUCK) {
+-		XftDrawRect(xw.draw, fg, winx, winy + 2 * dc.font.ascent * chscale / 3,
+-				width, 1);
+-	}
+-
+-	/* Reset clip to none. */
+-	XftDrawSetClip(xw.draw, 0);
 +        if (base.mode & ATTR_STRUCK) {
 +            XftDrawRect(xw.draw, fg, winx, winy + 2 * dc.font.ascent / 3,
 +                        width, 1);
@@ -158,7 +136,7 @@ index aa09997..85deee6 100644
  }
  
  void
-@@ -1513,18 +1506,21 @@ xdrawglyph(Glyph g, int x, int y)
+@@ -1524,7 +1518,7 @@ xdrawglyph(Glyph g, int x, int y)
  	XftGlyphFontSpec spec;
  
  	numspecs = xmakeglyphfontspecs(&spec, &g, 1, x, y);
@@ -167,23 +145,7 @@ index aa09997..85deee6 100644
  }
  
  void
--xdrawcursor(int cx, int cy, Glyph g, int ox, int oy, Glyph og)
-+xdrawcursor(int cx, int cy, Glyph g, int ox, int oy, Glyph og, Line line, int len)
- {
- 	Color drawcol;
- 
- 	/* remove the old cursor */
- 	if (selected(ox, oy))
- 		og.mode ^= ATTR_REVERSE;
--	xdrawglyph(og, ox, oy);
-+
-+	/* Redraw the line where cursor was previously.
-+	 * It will restore wide glyphs and ligatures broken by the cursor. */
-+	xdrawline(line, 0, oy, len);
- 
- 	if (IS_SET(MODE_HIDE))
- 		return;
-@@ -1648,32 +1644,39 @@ xstartdraw(void)
+@@ -1659,32 +1653,39 @@ xstartdraw(void)
  void
  xdrawline(Line line, int x1, int y1, int x2)
  {
@@ -247,5 +209,5 @@ index aa09997..85deee6 100644
  
  void
 -- 
-2.39.0
+2.35.1
 
