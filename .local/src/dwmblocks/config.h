@@ -19,6 +19,7 @@ static const Block blocks[] = {
 	// {"",	"sb-forecast",	18000,	5},
 	// {"",	"sb-mailbox",	180,	12},
 	// {"",	"sb-nettraf",	1,	16},
+	{"",	"/home/stephen/.local/bin/mic.sh",	0,	9},
 	{"",	"/home/stephen/.local/bin/volume.sh",	0,	10},
 	// {"",	"sb-battery",	5,	3},
 	{"",	"/home/stephen/.local/bin/clock.sh",	60,	1},

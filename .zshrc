@@ -107,3 +107,5 @@ export BROWSER="firefox"
 
 # Setting up starship
 eval "$(starship init zsh)"
+
+export PATH=$PATH:/home/stephen/.spicetify
