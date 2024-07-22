@@ -12,18 +12,18 @@ static const Block blocks[] = {
 	/* {"",	"sb-price eth Ethereum 🍸 23",			9000,	23}, */
 	/* {"",	"sb-price btc Bitcoin 💰 21",			9000,	21}, */
 	// {"",	"sb-torrent",	20,	7},
-	{"",	"/home/stephen/.local/bin/spotify.sh",	5,	15},
-	{"",	"/home/stephen/.local/bin/memory.sh",	10,	14},
+	{"",	"spotify.sh",	5,	15},
+	{"",	"memory.sh",	10,	14},
 	/* {"",	"sb-cpu",		10,	18}, */
 	/* {"",	"sb-moonphase",	18000,	17}, */
 	// {"",	"sb-doppler",	0,	13},
 	// {"",	"sb-forecast",	18000,	5},
 	// {"",	"sb-mailbox",	180,	12},
 	// {"",	"sb-nettraf",	1,	16},
-	{"",	"/home/stephen/.local/bin/mic.sh",	0,	9},
-	{"",	"/home/stephen/.local/bin/volume.sh",	0,	10},
+	{"",	"mic.sh",	0,	9},
+	{"",	"volume.sh",	0,	10},
 	// {"",	"sb-battery",	5,	3},
-	{"",	"/home/stephen/.local/bin/clock.sh",	60,	1},
+	{"",	"clock.sh",	60,	1},
 	// {"",	"sb-internet",	5,	4},
 	/* {"",	"sb-iplocate", 0,	27}, */
 	// {"",	"sb-help-icon",	0,	15},

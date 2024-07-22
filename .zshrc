@@ -93,7 +93,7 @@ source <(fzf --zsh)
 # export ARCHFLAGS="-arch x86_64"
 
 export BROWSER="firefox"
-export PATH=$PATH:/home/stephen/.spicetify:/home/stephen/Downloads/spotifyc
+# export PATH=$PATH:/home/stephen/.spicetify:/home/stephen/Downloads/spotifyc
 
 # Set personal aliases, overriding those provided by Oh My Zsh libs,
 # plugins, and themes. Aliases can be placed here, though Oh My Zsh

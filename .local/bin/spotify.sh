@@ -1,14 +1,14 @@
 #!/bin/sh
 
 case $BLOCK_BUTTON in
-    1) /home/stephen/Downloads/spotifyc/spotifyc -c; pkill -RTMIN+15 "${STATUSBAR:-dwmblocks}" ;;
-    2) /home/stephen/Downloads/spotifyc/spotifyc -n; pkill -RTMIN+15 "${STATUSBAR:-dwmblocks}" ;;
-    3) /home/stephen/Downloads/spotifyc/spotifyc -p; pkill -RTMIN+15 "${STATUSBAR:-dwmblocks}" ;;
-    5) /home/stephen/Downloads/spotifyc/spotifyc -v -5 2> /dev/null; pkill -RTMIN+15 "${STATUSBAR:-dwmblocks}" ;;
-    4) /home/stephen/Downloads/spotifyc/spotifyc -v +5 2> /dev/null; pkill -RTMIN+15 "${STATUSBAR:-dwmblocks}" ;;
+    1) spotifyc -c; pkill -RTMIN+15 "${STATUSBAR:-dwmblocks}" ;;
+    2) spotifyc -n; pkill -RTMIN+15 "${STATUSBAR:-dwmblocks}" ;;
+    3) spotifyc -p; pkill -RTMIN+15 "${STATUSBAR:-dwmblocks}" ;;
+    5) spotifyc -v -5 2> /dev/null; pkill -RTMIN+15 "${STATUSBAR:-dwmblocks}" ;;
+    4) spotifyc -v +5 2> /dev/null; pkill -RTMIN+15 "${STATUSBAR:-dwmblocks}" ;;
 esac
 
-prompt="$(/home/stephen/Downloads/spotifyc/spotifyc -f '{{ icon }} {{ artist }}: {{ title }}' -i '' '' -o )"
+prompt="$(spotifyc -f '{{ icon }} {{ artist }}: {{ title }}' -i '' '' -o )"
 
 if [ ${#prompt} -gt 35 ]; then
     truncated=$(echo "$prompt" | cut -c1-35)

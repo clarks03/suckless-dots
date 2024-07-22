@@ -1,6 +1,6 @@
-# dwmblocks
+# dwmblocks - Luke Smith's build
 
-Modular status bar for dwm written in c.
+The following text is from Luke Smith's README from his build of dwmblocks (which I'm using)
 
 # Modifying blocks
 
@@ -42,3 +42,26 @@ of this using the `$BLOCK_BUTTON` variable.
 For this feature to work, you need the appropriate patch in dwm as well. See
 [here](https://dwm.suckless.org/patches/statuscmd/).
 Credit for those patches goes to Daniel Bylinka (daniel.bylinka@gmail.com).
+
+--- 
+
+Now back to my own README xd
+
+### Modules
+
+- spotify
+    - my own
+- memory
+    - from Luke Smith's rice
+- mic volume
+    - my own; a modified version of Luke Smith's volume module
+- volume
+    - from Luke Smith's rice
+- clock
+    - modified from Luke Smith's rice
+
+**FOR THESE TO LOOK NORMAL, YOU GOTTA HAVE THE STATUS2D PATCH ON DWM!!!**
+
+### Prerequisites
+
+spotifyc -> for spotify module

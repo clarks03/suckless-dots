@@ -27,5 +27,7 @@
     - gets colourscheme from xrdb
 - osu! "patch"
     - allows for alt-tabbing from fullscreen applications (like games) without the game crashing
+- bar height
+    - increases the size of the bar via. a variable in `config.h`
 
 **NOTE:** If you are planning on patching your own dwm based on these patches, do take a look at the patches themselves beforehand. Some of them have special versions depending on patches you've already applied (for example, statuscmd has a special patch in case you've already downloaded status2d first, which is recommended).
