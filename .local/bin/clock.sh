@@ -28,4 +28,5 @@ esac
 
 # Time = %Y %b %d (%a) 
 
-date "+^b#83a598^  $icon  ^b#ebdbb2^  %I:%M%p  "
+date "+^c#d3869b^$icon %I:%M%p "
+

@@ -655,6 +655,7 @@ clientmessage(XEvent *e)
 			XSelectInput(dpy, c->win, StructureNotifyMask | PropertyChangeMask | ResizeRedirectMask);
 			XReparentWindow(dpy, c->win, systray->win, 0, 0);
 			/* use parents background color */
+			/* swa.background_pixel  = scheme[SchemeStatus][ColBg].pixel; */
 			swa.background_pixel  = scheme[SchemeNorm][ColBg].pixel;
 			XChangeWindowAttributes(dpy, c->win, CWBackPixel, &swa);
 			sendevent(c->win, netatom[Xembed], StructureNotifyMask, CurrentTime, XEMBED_EMBEDDED_NOTIFY, 0 , systray->win, XEMBED_EMBEDDED_VERSION);
@@ -1377,9 +1378,9 @@ loadxrdb()
         XRDB_LOAD_COLOR("dwm.color0", selfgcolor);
         XRDB_LOAD_COLOR("dwm.color15", statusbgcolor);
         XRDB_LOAD_COLOR("dwm.color0", statusfgcolor);
-        XRDB_LOAD_COLOR("dwm.color15", normtagsbgcolor);
-        XRDB_LOAD_COLOR("dwm.color0", normtagsfgcolor);
-        XRDB_LOAD_COLOR("dwm.color11", seltagsbgcolor);
+        XRDB_LOAD_COLOR("dwm.color0", normtagsbgcolor);
+        XRDB_LOAD_COLOR("dwm.color15", normtagsfgcolor);
+        XRDB_LOAD_COLOR("dwm.color15", seltagsbgcolor);
         XRDB_LOAD_COLOR("dwm.color0", seltagsfgcolor);
         XRDB_LOAD_COLOR("dwm.color0", norminfobgcolor);
         XRDB_LOAD_COLOR("dwm.color15", norminfofgcolor);
@@ -2000,7 +2001,7 @@ setup(void)
 	if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
 		die("no fonts could be loaded.");
 	lrpad = drw->fonts->h;
-	bh = drw->fonts->h + 2;
+	bh = drw->fonts->h + user_bh;
 	updategeom();
 	/* init atoms */
 	utf8string = XInternAtom(dpy, "UTF8_STRING", False);
@@ -2547,6 +2548,7 @@ updatesystray(void)
 		systray->win = XCreateSimpleWindow(dpy, root, x, m->by, w, bh, 0, 0, scheme[SchemeSel][ColBg].pixel);
 		wa.event_mask        = ButtonPressMask | ExposureMask;
 		wa.override_redirect = True;
+		/* wa.background_pixel  = scheme[SchemeStatus][ColBg].pixel; */
 		wa.background_pixel  = scheme[SchemeNorm][ColBg].pixel;
 		XSelectInput(dpy, systray->win, SubstructureNotifyMask);
 		XChangeProperty(dpy, systray->win, netatom[NetSystemTrayOrientation], XA_CARDINAL, 32,
@@ -2568,6 +2570,7 @@ updatesystray(void)
 	for (w = 0, i = systray->icons; i; i = i->next) {
 		/* make sure the background color stays the same */
 		wa.background_pixel  = scheme[SchemeNorm][ColBg].pixel;
+		/* wa.background_pixel  = scheme[SchemeStatus][ColBg].pixel; */
 		XChangeWindowAttributes(dpy, i->win, CWBackPixel, &wa);
 		XMapRaised(dpy, i->win);
 		w += systrayspacing;

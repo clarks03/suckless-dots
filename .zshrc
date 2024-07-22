@@ -73,6 +73,7 @@ ZSH_THEME="robbyrussell"
 plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
 
 source $ZSH/oh-my-zsh.sh
+source <(fzf --zsh)
 
 # User configuration
 
@@ -92,6 +93,7 @@ source $ZSH/oh-my-zsh.sh
 # export ARCHFLAGS="-arch x86_64"
 
 export BROWSER="firefox"
+export PATH=$PATH:/home/stephen/.spicetify:/home/stephen/Downloads/spotifyc
 
 # Set personal aliases, overriding those provided by Oh My Zsh libs,
 # plugins, and themes. Aliases can be placed here, though Oh My Zsh
@@ -104,8 +106,9 @@ export BROWSER="firefox"
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+alias iv='nvim $(fzf --preview="bat --color=always {}")'
 
 # Setting up starship
 eval "$(starship init zsh)"
 
-export PATH=$PATH:/home/stephen/.spicetify
+

@@ -16,8 +16,10 @@ static const unsigned int gappov    = 0;        /* vert outer gap between window
 static       int smartgaps          = 0;        /* 1 means no outer gap when there is only one window */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
-static const char *fonts[]          = { "Iosevka Nerd Font:size=10", "Noto Fonts Emoji:size=10" };
-static const char dmenufont[]       = "Iosevka Nerd Font:size=10";
+static const int user_bh            = 8;        /* 2 is the default spacing around the bar's font */
+// static const char *fonts[]          = { "Iosevka Nerd Font:size=10", "Noto Fonts Emoji:size=10" };
+static const char *fonts[]          = { "JetBrainsMono Nerd Font:size=10", "Noto Fonts Emoji:size=10" };
+static const char dmenufont[]       = "JetBrainsMono Nerd Font:size=10";
 static char normbgcolor[]           = "#222222";
 static char normbordercolor[]       = "#444444";
 static char normfgcolor[]           = "#bbbbbb";
@@ -101,7 +103,7 @@ static const Layout layouts[] = {
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", normbgcolor, "-nf", normtagsbgcolor, "-sb", normtagsbgcolor, "-sf", normbgcolor, "-nhb", normbgcolor, "-nhf", "#fb4934", "-shb", normtagsbgcolor, "-shf", "#fb4934", NULL };
+static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", normbgcolor, "-nf", normtagsfgcolor, "-sb", seltagsbgcolor, "-sf", seltagsfgcolor, "-nhb", normbgcolor, "-nhf", "#fb4934", "-shb", seltagsbgcolor, "-shf", "#fb4934", NULL };
 static const char *termcmd[]  = { "st", NULL };
 
 static const Key keys[] = {
@@ -114,8 +116,8 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
 	{ MODKEY,                       XK_s,      incnmaster,     {.i = +1 } },
 	{ MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },
-	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },
-	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },
+	{ MODKEY|ShiftMask,             XK_h,      setmfact,       {.f = -0.05} },
+	{ MODKEY|ShiftMask,             XK_l,      setmfact,       {.f = +0.05} },
     { MODKEY|ShiftMask,             XK_j,      setcfact,       {.f = -0.25} },
     { MODKEY|ShiftMask,             XK_k,      setcfact,       {.f = +0.25} },
     { MODKEY|ShiftMask,             XK_o,      setcfact,       {.f =  0.00} },
