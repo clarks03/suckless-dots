@@ -22,4 +22,9 @@ dwmblocks &  # not sure if setsid is necessary here or not
 # Setting up notifs with dunst
 dunst &  # only keeping this here for now just so i can test if the dwmblocks scripts are working
 
+# Setting up redshift
+# This should reduce eyestrain!! Yay!!!
+# Using New York's latitude & longitude. Close enough to where I am.
+redshift -l 40.7128:-74 &
+
 exec dwm
